@@ -1,17 +1,8 @@
-#!/usr/bin/env bash
-
-# Update package lists and install Nginx
-apt-get update
-apt-get install -y nginx
-
-# Modify default Nginx configuration to listen on port 80
-sed -i 's/80 default_server;/80;/g' /etc/nginx/sites-available/default
-
-# Restart Nginx
-/etc/init.d/nginx restart &
-
-# Create HTML file containing "Holberton School"
-echo "Holberton School" > /var/www/html/index.html
-
-# Script execution completed
-echo "Nginx installed and configured. Server is ready."
+!/usr/bin/env bash
+# Updating packages
+apt install nginx
+service nginx start
+rm /var/www/html/index.nginx-debian.html
+touch /var/www/html/index.html
+echo "<html><head></head><body><p>Holberton School</p></body></html>" > /var/www/html/index.html
+service nginx restart
