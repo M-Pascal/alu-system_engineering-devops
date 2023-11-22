@@ -1,20 +1,17 @@
 #!/usr/bin/env bash
-# Installs Nginx with the following configurations:
-#  Listens on port 80.
-#  Returns a page containing "Holberton School" when queried.
 
+# Update package lists and install Nginx
 apt-get update
 apt-get install -y nginx
 
-mkdir /etc/nginx/html
-touch /etc/nginx/html/index.html
-echo "Holberton School" > /etc/nginx/html/index.html
-printf %s "server {
-     listen      80 default_server;
-     listen      [::]:80 default_server;
-     root        /etc/nginx/html;
-     index       index.html index.htm;
-}
-" > /etc/nginx/sites-available/default
+# Modify default Nginx configuration to listen on port 80
+sed -i 's/80 default_server;/80;/g' /etc/nginx/sites-available/default
 
-service nginx restart
+# Restart Nginx
+/etc/init.d/nginx restart &
+
+# Create HTML file containing "Holberton School"
+echo "Holberton School" > /var/www/html/index.html
+
+# Script execution completed
+echo "Nginx installed and configured. Server is ready."
