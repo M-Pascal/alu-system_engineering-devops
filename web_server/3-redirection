@@ -1,12 +1,13 @@
-#!/usr/bin/env bash
-# Install Nginx if not already installed
+#!/bin/bash
+
+# Check if Nginx is installed, if not, install it
 if ! command -v nginx &> /dev/null; then
     sudo apt-get update
     sudo apt-get install -y nginx
 fi
 
 # Create a configuration file for the redirection
-sudo bash -c 'cat <<EOL > /etc/nginx/sites-available/redirect_me
+sudo bash -c 'cat > /etc/nginx/sites-available/redirect_me <<EOF
 server {
     listen 80;
     server_name _;
@@ -14,9 +15,9 @@ server {
         return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
     }
 }
-EOL'
+EOF'
 
-# Create a symbolic link to enable the site
+# Enable the redirection site
 sudo ln -s /etc/nginx/sites-available/redirect_me /etc/nginx/sites-enabled/
 
 # Remove default Nginx site if needed
