@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Install Nginx if not already installed
+if ! command -v nginx &> /dev/null; then
+    sudo apt-get update
+    sudo apt-get install -y nginx
+fi
+
+# Obtain the hostname
+HOSTNAME=$(hostname)
+
+# Configure Nginx to include the custom header
+sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/default
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name _;
+
+    add_header X-Served-By $HOSTNAME;
+
+    location / {
+        # Adjust proxy_pass if needed
+        proxy_pass http://localhost:5000;
+    }
+}
+EOF'
+
+# Remove default configuration symlink if needed
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# Test Nginx configuration
+sudo nginx -t
+
+# Restart Nginx to apply changes
+sudo systemctl restart nginx
