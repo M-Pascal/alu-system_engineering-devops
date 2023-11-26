@@ -1,35 +1,32 @@
 #!/usr/bin/env bash
-# Install Nginx if not already installed
-if ! command -v nginx &> /dev/null; then
-    sudo apt-get update
-    sudo apt-get install -y nginx
-fi
+# comment 
+# inspired from https://stackoverflow.com/questions/22306006/configuration-file-etc-nginx-nginx-conf-test-failed-how-do-i-know-why-this-h
+sudo apt remove --purge nginx nginx-full nginx-common -y
+sudo apt update
+sudo apt install nginx -y
+sudo touch /var/www/html/index.html
 
-# Obtain the hostname
-HOSTNAME=$(hostname)
+echo "Holberton School" | sudo tee /var/www/html/index.html
+sudo touch /var/www/html/error404.html
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/error404.html
 
-# Configure Nginx to include the custom header
-sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/default
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+printf %s 'server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
 
-    server_name _;
+        root /var/www/html;
 
-    add_header X-Served-By $HOSTNAME;
+        index index.html;
+        error_page 404 /error404.html;
 
-    location / {
-        # Adjust proxy_pass if needed
-        proxy_pass http://localhost:5000;
-    }
+        server_name _;
+        
+        add_header X-Served-By $hostname;
+        
+        location /redirect_me {
+           return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4/;
+        }
 }
-EOF'
+' | sudo tee /etc/nginx/sites-available/default
 
-# Remove default configuration symlink if needed
-sudo rm -f /etc/nginx/sites-enabled/default
-
-# Test Nginx configuration
-sudo nginx -t
-
-# Restart Nginx to apply changes
-sudo systemctl restart nginx
+sudo service nginx restart
